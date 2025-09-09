@@ -48,7 +48,7 @@ void loop(){
   // lcd.print(yValue);
   lcd.print("%");
   //delay(250);
-  if (DHT.humidity>63 && DHT.humidity<70){
+  if (DHT.humidity>50 && DHT.humidity<70){
     setColor(255,50,0);
   } else if (DHT.humidity>69) {
     setColor(255,0,0);
