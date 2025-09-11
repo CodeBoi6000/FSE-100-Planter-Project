@@ -55,7 +55,14 @@ class fan {
 
 class tempPID {
   private:
-    double ref = 0;
+    double tref = 0;
+    double integral = 0;
+    double prevError = 0;
+    double prevTime = 0;
+    double tP = 0;
+    double tI = 0;
+    double tD = 0;
+
   public:
     void setPID(double P, double I, double D){
       double tP = P;
@@ -64,12 +71,25 @@ class tempPID {
     }
 
     void setRef(double Target){
-      ref = Target;
-      double accErr = 0;
+      tref = Target;
     }
 
-    void getResult(double Input) {
-      double error =  - Input;
+    double getResult(double Input) {
+      double error = Input - tref;
+      double time = millis();
+      double dt = (time - prevTime)/1000;
+      double proportional = error;
+      integral += error * dt;
+      double derivative = (error - prevError) / dt;
+      prevError = error;
+      prevTime = time;
+      double output = ((tP * proportional) + (tI * integral) + (tD * derivative));
+      if (output > 1) {
+        output = 1;
+      } else if (output < 0) {
+        output = 0;
+      }
+      return (output);
     }
 };
 
@@ -77,6 +97,9 @@ void loop(){
   int chk = DHT.read11(DHT11_PIN);
   UI UI;
   fan fan;
+  tempPID tempPID;
+  tempPID.setPID(0.5,0.001,0.01);
+  tempPID.setRef(70);
   lcd.setCursor(0,0); 
   lcd.print("Temp: ");
   lcd.print(DHT.temperature);
@@ -88,12 +111,10 @@ void loop(){
   lcd.print("%");
   if (DHT.humidity>65 && DHT.humidity<70){
     UI.setColor(255,50,0);
-    fan.run(0.5);
   } else if (DHT.humidity>69) {
     UI.setColor(255,0,0);
-    fan.run(1);
   } else {
     UI.setColor(0,255,0);
-    fan.stop();
   }
+  fan.run(tempPID.getResult(DHT.humidity));
 }
