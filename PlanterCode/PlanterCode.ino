@@ -43,6 +43,7 @@ class UI{
 
 class fan {
   public:
+    bool startup;
     void run(double speed) {
       analogWrite(fanPin, 255 * speed);
     }
@@ -59,12 +60,12 @@ class tempPID {
     double integral = 0;
     double prevError = 0;
     double prevTime = 0;
-    double tP = 0;
-    double tI = 0;
-    double tD = 0;
+    double tP;
+    double tI;
+    double tD;
 
   public:
-    void setPID(double P, double I, double D){
+    void setPID(double P = 0, double I = 0, double D = 0){
       double tP = P;
       double tI = I;
       double tD = D;
@@ -83,7 +84,7 @@ class tempPID {
       double derivative = (error - prevError) / dt;
       prevError = error;
       prevTime = time;
-      double output = ((tP * proportional) + (tI * integral) + (tD * derivative));
+      double output = ((0.05 * proportional) + (0.0001 * integral) + (0.001 * derivative));
       if (output > 1) {
         output = 1;
       } else if (output < 0) {
@@ -92,17 +93,17 @@ class tempPID {
       return (output);
     }
 };
-
+tempPID tempPID;
 void loop(){
   int chk = DHT.read11(DHT11_PIN);
   UI UI;
   fan fan;
-  tempPID tempPID;
-  tempPID.setPID(0.5,0.001,0.01);
+  // tempPID tempPID;
+  tempPID.setPID(0.5,0.00001,0.01);
   tempPID.setRef(70);
   lcd.setCursor(0,0); 
   lcd.print("Temp: ");
-  lcd.print(DHT.temperature);
+  lcd.print(tempPID.getResult(DHT.humidity));
   lcd.print((char)223);
   lcd.print("C   ");
   lcd.setCursor(0,1);
