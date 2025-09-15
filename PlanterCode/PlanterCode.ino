@@ -43,7 +43,7 @@ class UI{
 
 class fan {
   public:
-    bool startup;
+    bool startup = true;
     void run(double speed) {
       analogWrite(fanPin, 255 * speed);
     }
@@ -87,18 +87,20 @@ class tempPID {
       double output = ((0.05 * proportional) + (0.0001 * integral) + (0.001 * derivative));
       if (output > 1) {
         output = 1;
+      } else if (output > 0 && output < 0.2) {
+        output = 0.2;
       } else if (output < 0) {
         output = 0;
       }
       return (output);
     }
 };
+
+UI UI;
+fan fan;
 tempPID tempPID;
 void loop(){
   int chk = DHT.read11(DHT11_PIN);
-  UI UI;
-  fan fan;
-  // tempPID tempPID;
   tempPID.setPID(0.5,0.00001,0.01);
   tempPID.setRef(70);
   lcd.setCursor(0,0); 
