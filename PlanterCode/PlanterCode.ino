@@ -1,17 +1,17 @@
 #include <dht.h>
 #include <LiquidCrystal.h>
 
-LiquidCrystal lcd(12, 13, 5, 4, 3, 2);
+LiquidCrystal lcd(12, 13, 5, 4, 3, 2); // (RS, E, D4, D5, D6, D7)
 dht DHT;
 
-#define DHT11_PIN 7
-#define VRX_PIN  A1
-#define VRY_PIN  A0
-int redPin= 10;
-int greenPin = 9;
-int bluePin = 8;
-int fanPin = 11;
-int BUT_PIN = 6;
+#define DHT11_PIN 7 // DHT11 data pin
+#define VRX_PIN  A1 //Joystick X axis
+#define VRY_PIN  A0 //Joystick Y axis
+int redPin= 10; //Red leg of LED
+int greenPin = 9; //Green leg of LED
+int bluePin = 8; //Blue leg of LED
+int fanPin = 11; //Transister middle pole
+int BUT_PIN = 6; //Joystick button
 
 void setup(){
   lcd.begin(16, 2);
