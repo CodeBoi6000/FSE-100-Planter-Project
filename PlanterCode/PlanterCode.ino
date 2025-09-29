@@ -9,9 +9,10 @@ dht DHT;
 #define VRY_PIN  A0 //Joystick Y axis
 int redPin= 10; //Red leg of LED
 int greenPin = 9; //Green leg of LED
-int bluePin = 8; //Blue leg of LED
+int bluePin = 1; //Blue leg of LED
 int fanPin = 11; //Transister middle pole
 int BUT_PIN = 6; //Joystick button
+int BUZZ_PIN = 8; // Buzzer pin
 
 void setup(){
   lcd.begin(16, 2);
@@ -19,6 +20,8 @@ void setup(){
   pinMode(fanPin, OUTPUT);
   pinMode(redPin,  OUTPUT);              
   pinMode(greenPin, OUTPUT);
+  pinMode(BUZZ_PIN, OUTPUT);
+  digitalWrite(BUZZ_PIN, LOW);
   pinMode(bluePin, OUTPUT);
 }
 
@@ -101,11 +104,12 @@ fan fan;
 tempPID tempPID;
 void loop(){
   int chk = DHT.read11(DHT11_PIN);
-  tempPID.setPID(0.5,0.00001,0.01);
+  tempPID.setPID(0.75, 00001,0.01);
   tempPID.setRef(70);
   lcd.setCursor(0,0); 
   lcd.print("Temp: ");
-  lcd.print(tempPID.getResult(DHT.humidity));
+  lcd.print(DHT.temperature);
+  //lcd.print(tempPID.getResult(DHT.humidity));
   lcd.print((char)223);
   lcd.print("C   ");
   lcd.setCursor(0,1);
@@ -114,10 +118,13 @@ void loop(){
   lcd.print("%");
   if (DHT.humidity>65 && DHT.humidity<70){
     UI.setColor(255,50,0);
+    digitalWrite(BUZZ_PIN, LOW);
   } else if (DHT.humidity>69) {
     UI.setColor(255,0,0);
+    digitalWrite(BUZZ_PIN, HIGH);
   } else {
     UI.setColor(0,255,0);
+    digitalWrite(BUZZ_PIN, LOW);
   }
   fan.run(tempPID.getResult(DHT.humidity));
 }
